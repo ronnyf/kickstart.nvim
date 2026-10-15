@@ -22,5 +22,10 @@ return {
         diagnostics = 'nvim_lsp',
       },
     }
+
+    -- Tab / Shift-Tab cycle to the next / previous buffer in the bufferline
+    -- (bufferline registers these commands during the setup above).
+    vim.keymap.set({ 'n', 'v' }, '<Tab>',   ':BufferLineCycleNext<CR>', { desc = 'Next buffer' })
+    vim.keymap.set({ 'n', 'v' }, '<S-Tab>', ':BufferLineCyclePrev<CR>', { desc = 'Previous buffer' })
   end,
 }
