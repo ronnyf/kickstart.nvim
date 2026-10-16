@@ -27,5 +27,17 @@ return {
     -- (bufferline registers these commands during the setup above).
     vim.keymap.set({ 'n', 'v' }, '<Tab>',   ':BufferLineCycleNext<CR>', { desc = 'Next buffer' })
     vim.keymap.set({ 'n', 'v' }, '<S-Tab>', ':BufferLineCyclePrev<CR>', { desc = 'Previous buffer' })
+
+    -- <leader>x closes the current buffer (tab). Uses native :bd (bdelete)
+    -- rather than a bufferline command, since v4 has no "close current buffer"
+    -- command. Guarded so the last remaining buffer is never deleted, and
+    -- non-force so unsaved changes are not silently discarded.
+    vim.keymap.set('n', '<leader>x', function()
+      if #vim.api.nvim_list_buflist() < 2 then
+        print('Not closing the only open buffer')
+        return
+      end
+      vim.cmd('bd')
+    end, { desc = 'Close current buffer' })
   end,
 }
