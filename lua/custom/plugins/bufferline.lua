@@ -28,12 +28,23 @@ return {
     vim.keymap.set({ 'n', 'v' }, '<Tab>',   ':BufferLineCycleNext<CR>', { desc = 'Next buffer' })
     vim.keymap.set({ 'n', 'v' }, '<S-Tab>', ':BufferLineCyclePrev<CR>', { desc = 'Previous buffer' })
 
-    -- <leader>x closes the current buffer (tab). Uses native :bd (bdelete)
-    -- rather than a bufferline command, since v4 has no "close current buffer"
-    -- command. Guarded so the last remaining buffer is never deleted, and
-    -- non-force so unsaved changes are not silently discarded.
+    -- <leader>x closes the current buffer. Uses native :bd (bdelete) rather
+    -- than a bufferline command, since v4 has no "close current buffer"
+    -- command. Guarded so the last remaining *listed* buffer is never
+    -- deleted (closing a non-listed window such as a terminal or quickfix is
+    -- always safe), and non-force so unsaved changes are not silently
+    -- discarded.
     vim.keymap.set('n', '<leader>x', function()
-      if #vim.api.nvim_list_buflist() < 2 then
+      local current = vim.api.nvim_get_current_buf()
+      local listed = vim.fn.getbufinfo({ buflisted = 1 })
+      local current_listed = false
+      for _, b in ipairs(listed) do
+        if b.bufnr == current then
+          current_listed = true
+          break
+        end
+      end
+      if current_listed and #listed < 2 then
         print('Not closing the only open buffer')
         return
       end
