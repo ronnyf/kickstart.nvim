@@ -28,14 +28,14 @@ return {
     vim.keymap.set({ 'n', 'v' }, '<Tab>',   ':BufferLineCycleNext<CR>', { desc = 'Next buffer' })
     vim.keymap.set({ 'n', 'v' }, '<S-Tab>', ':BufferLineCyclePrev<CR>', { desc = 'Previous buffer' })
 
-    -- <leader>x closes the current buffer with native :bd (bdelete) rather
-    -- than a bufferline command (v4 has no "close current buffer" command).
-    -- Deliberately unconditional: closing the last buffer is safe — Neovim
-    -- just drops you into a fresh empty buffer rather than quitting or
-    -- crashing — and a non-force :bd still refuses to discard unsaved
-    -- changes (E37).
+    -- <leader>x closes the current buffer via mini.bufremove rather than a
+    -- bufferline command (v4 has no "close current buffer" command) or plain
+    -- :bd, which closes every window showing the buffer — with neo-tree open
+    -- that left only the tree. mini.bufremove swaps each such window to the
+    -- alternate buffer first, keeping the layout, and asks before discarding
+    -- unsaved changes.
     vim.keymap.set('n', '<leader>x', function()
-      vim.cmd('bd')
+      require('mini.bufremove').delete()
     end, { desc = 'Close current buffer' })
   end,
 }
